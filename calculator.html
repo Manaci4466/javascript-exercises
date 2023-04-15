@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+  @import url('https://fonts.googleapis.com/css2?family=Roboto&family=Source+Sans+3:wght@200&display=swap');
+
+        body{
+
+            min-height: 100vh;
+            background-color: 	#28282B;
+            margin: 0 10vw 0 10vw;
+        }
+
+        header {
+            padding: 30px;
+            text-align: center;
+            font-size: larger;
+            font-weight: 600 ;
+            font-family: monospace;
+            text-shadow: 0 -1px 0 #fff, 0 1px 0 #2e2e2e, 0 2px 0 #2c2c2c, 0 3px 0 #2a2a2a, 0 4px 0 #282828, 0 5px 0 #262626, 0 6px 0 #242424, 0 7px 0 #222, 0 8px 0 #202020, 0 9px 0 #1e1e1e, 0 10px 0 #1c1c1c, 0 11px 0 #1a1a1a, 0 12px 0 #181818, 0 13px 0 #161616, 0 14px 0 #141414, 0 15px 0 #121212, 0 22px 30px rgba(0, 0, 0, 0.9);
+            color: whitesmoke;
+        }
+
+        .grid-container {
+
+            display: grid;
+            grid-template-columns: 3fr 2fr;
+            grid-template-rows: 1fr 5fr;
+            gap: 10px;
+            grid-template-areas: "ds ds"
+                                 "nm op";
+
+        }
+
+        #display {
+
+        grid-area: ds;
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-end;
+        height: 100px;
+        background: whitesmoke;
+        border-top-right-radius: 20px;    
+        border-top-left-radius: 20px;    
+
+
+        }
+
+        #display div {
+
+            
+            padding-left: 15px;
+            font-size: 1.2rem;
+        }
+
+        #display div p {
+
+            font-family: monospace;
+            margin: 10px 0px 10px 0;
+
+        }
+
+        #numbers {
+
+            grid-area: nm;
+            display: grid;
+            grid-template-columns: repeat(3,1fr);
+            grid-template-rows: repeat(4,1fr);
+            gap: 10px
+
+        }
+
+        #numbers div {
+
+            text-align: center;
+            box-shadow: 1px 3px 3px #000;
+            border-radius: 10px;
+            border: 1px solid black ;
+            background: whitesmoke; 
+
+        }
+
+        #numbers div span {
+
+            font-size: 1.5rem;
+            font-family: 'Source Sans 3', sans-serif;
+        }
+
+        #operations {
+            
+            grid-area: op;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: repeat(4,1fr);
+            gap: 10px;
+
+        }
+
+        #operations div {
+
+            text-align: center;
+            box-shadow: 1px 3px 3px #000;
+            border-radius: 10px;
+            border: 1px solid black ;
+            background: whitesmoke; 
+
+
+        }
+
+        #operations div span {
+
+            font-size: 1.5rem;
+            font-family: 'Source Sans 3', sans-serif;
+
+        }
+
+        #operations .run-operation {
+
+            background: #80b918;
+
+
+
+
+        }
+
+        #operations .clear-display {
+
+
+            background:#FF272A ;
+
+        }
+        
+
+        
+
+
+    </style>
+</head>
+<body>
+<header> <h1>Calculator Project</h1> </header>
+<section class="grid-container">
+    <section id="display">
+        <div>
+            <p id="display-text"></p>
+        </div>
+    </section>
+    <section id="numbers">
+        <div><span>0</span></div>
+        <div><span>1</span></div>
+        <div><span>2</span></div>
+        <div><span>3</span></div>
+        <div><span>4</span></div>
+        <div><span>5</span></div>
+        <div><span>6</span></div>
+        <div><span>7</span></div>
+        <div><span>8</span></div>
+        <div><span>9</span></div>
+    </section>
+    <section id="operations">
+        <div><span>+</span></div>
+        <div><span>-</span></div>
+        <div><span>*</span></div>
+        <div><span>**</span></div>
+        <div><span>/</span></div>
+        <div><span>!</span></div>
+        <div class="clear-display"><span>clear</span></div>
+        <div class="run-operation"><span>=</span></div>
+    </section>
+</section>
+
+</body>
+<script>
+
+
+var isfreeNum = true;
+var operator = "";
+var num1 = "" ;
+var displayVal = "";
+var tempArr = [] ;
+var resultArr = [];
+var result ;
+
+const clearElement = document.querySelector(".clear-display");
+const equalElement = document.querySelector(".run-operation")
+
+clearElement.addEventListener("click",() => {
+
+    clear();
+    
+
+})
+
+equalElement.addEventListener("click",(item) => {
+
+    sum();
+
+})
+
+const numbers = document.getElementById("numbers");
+numbers.childNodes.forEach((item) => {
+    
+    item.addEventListener("click",(e) =>{
+
+
+
+        tempArr.push(e.target.innerText);
+        populate(e.target.innerText)
+        
+       console.log(resultArr);
+    }
+
+    )
+
+})
+
+const operators = document.querySelector("#operations");
+operators.childNodes.forEach((item) => {
+
+    if(item.className === "clear-display" || item.className === "run-operation") return;
+
+    item.addEventListener("click",(e) => {
+        
+        resultArr = tempArr.join('').split(" ")
+        if(resultArr.length === 3 && isfreeNum){
+            
+            isfreeNum = false ;
+            clear();
+         result = operate(resultArr[1],resultArr[0],resultArr[2]);
+            populate(result)
+        }
+
+         
+       
+
+            if(result > 0){
+                resultArr = tempArr.join('').split(" ");
+                if(resultArr.length === 3 && resultArr === " ! "){
+                    temp = result;
+                    console.log(temp)
+                    clear();
+                    result = operate(resultArr[1],temp,)
+                    populate(result)
+
+                }
+                
+                if(resultArr.length === 3){
+                    temp = result;
+                    console.log(temp)
+                    clear();
+                    result = operate(resultArr[1],temp,resultArr[2])
+                    populate(result)
+
+                }
+
+            }
+
+        
+        
+        operator = e.target.innerText;
+        tempArr.push((" " + operator + " "));
+        console.log(result)
+        console.log(resultArr);
+        populate(" " + operator + " ");
+
+
+    })
+
+
+})
+
+const clear = () => {
+
+    displayVal = "";
+    populate('');
+    [num1,num2] = ["",""]
+    operator = "";
+    tempArr = [];
+    
+}
+
+
+const populate = (character) => {
+
+    
+
+    const textContainer = document.querySelector("#display-text");
+    displayVal += character
+    textContainer.innerText = "";
+    textContainer.innerText += displayVal;
+    
+
+
+}
+
+
+const sum = function(arr1) {
+   
+    // 1 ()
+    // 2 ** AND !
+    // 3 * AND /
+    // 4 + AND -
+    // substring characters === num1 + num2 + 3
+
+    
+  
+
+
+  return arr1.length == 0 ?  0 : arr1.reduce((prev,current) => prev + current)
+ 
+};
+
+
+
+const operate = (operator,num1, num2) => {
+
+    let result;
+
+
+    switch(operator){
+
+        case "+": result = add(num1,num2)
+        break;
+        case "-": result = subtract(num1,num2)
+        break;
+        case "*": result = multiply(num1,num2)
+        break;
+        case "**": result = power(num1,num2);
+        break;
+        case "!": result = factorial(num1);
+        break;
+        case "/": result = division(num1,num2);
+
+    }
+
+    return result
+}
+
+const add = function(num1,num2) {
+	// 2 + 2
+
+  return Number(num1) + Number(num2);
+
+};
+
+const subtract = function(num1,num2) {
+	// 2 - 2
+
+  return num1 > num2 ? num1 - num2 : num2 - num1;
+
+};
+
+const division = function(num1,num2) {
+  // sum of [2,2,2] = 6
+
+  if(num1 == 0 || num2 == 0)return;
+  return num1 / num2;
+ 
+};
+
+const multiply = function (num1,num2) {
+  return num1 * num2
+};
+const power = function(num1,power) {
+	// 2 ** 2 = 2 * 2
+
+  return num1 ** power;
+
+};
+
+const factorial = function(num) {
+  // 3! = 3 * 2 * 1
+  if (n === 0) return 1;
+  let product = 1;
+  for (let i = n; i > 0; i--) {
+    product *= i;
+  }
+  return product;
+	
+};
+
+
+
+
+</script>
+</html>
